@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 from lorabikeapp.models import Location
 
 import json
@@ -20,4 +22,15 @@ def uplink(request):
                             latitude = re[2], longitude = re[3], frame_count = re[1])
     return HttpResponse("Get the post data.")
     
-    
+
+def livemap(request):
+  if request.method == 'GET':
+    location = Location.objects.order_by('-id')[0]
+    context = {'latitude': location.latitude, 'longitude': location.longitude}
+    return render(request, 'livemap.html', context)
+
+def livemap_ajax(request):
+  if request.method == 'GET':
+    location = Location.objects.order_by('-id')[0]
+    context = {'latitude': location.latitude, 'longitude': location.longitude}
+    return JsonResponse(context)
