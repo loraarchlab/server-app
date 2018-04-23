@@ -6,6 +6,10 @@ $(document).ready(function() {
   const maxDisplayLevel = 19;
   let $la_num = $('#la-num');
   let $lo_num = $('#lo-num');
+  let $tr_num = $('#tr-num');
+  let $fr_num = $('#fr-num');
+  let $rs_num = $('#rs-num');
+  let $sn_num = $('#sn-num');
   const centralX = parseFloat($la_num.text());
   const centralY = parseFloat($lo_num.text());
   const centralPoint = new BMap.Point(centralY, centralX);
@@ -53,8 +57,13 @@ $(document).ready(function() {
 
   let updateLocation = function() {
     $.get("ajax/", function(data){
+      console.log(data);
       $la_num.text(data.latitude);
-      $lo_num.text(data.longitude);  
+      $lo_num.text(data.longitude);
+      $tr_num.text(data.track_time);
+      $fr_num.text(data.frame_count);
+      $rs_num.text(data.rssi);
+      $sn_num.text(data.snr); 
       convertor.translate([new BMap.Point(data.longitude, data.latitude)],
                           1, 5, translateCallback);
     });

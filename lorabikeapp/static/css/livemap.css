@@ -17,6 +17,7 @@ h1 {
 }
 
 .location {
-  text-align: right;
+  display: inline-block;
+  margin-right: 20px;
 }
 

@@ -15,8 +15,12 @@
 <body>
   <h1>LoRa Bike Tracking</h1>
   <div id="track-map"></div>
-  <p class="location">Current Latitude:&nbsp;<span id='la-num'>{{ latitude }}</span></p>
-  <p class="location">Current Longitude:&nbsp;<span id='lo-num'>{{ longitude }}</span></p>
+  <p class="location">Time:&nbsp;<span id='tr-num'>{{ track_time }}</span></p>
+  <p class="location">Frame Count:&nbsp;<span id='fr-num'>{{ frame_count }}</span></p>
+  <p class="location">Latitude:&nbsp;<span id='la-num'>{{ latitude }}</span></p>
+  <p class="location">Longitude:&nbsp;<span id='lo-num'>{{ longitude }}</span></p>
+  <p class="location">RSSI:&nbsp;<span id='rs-num'>{{ rssi }}</span></p>
+  <p class="location">SNR:&nbsp;<span id='sn-num'>{{ snr }}</span></p>
   <!-- include the javascript api file -->
   <script src="http://api.map.baidu.com/api?v=3.0&ak=PsXGGKusCXo2tR27G3esOysXcMs0OG6b"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
