@@ -14,6 +14,7 @@ import datetime
 def uplink(request):
   if request.method == 'POST':
     received_json = json.loads(request.body.decode('utf-8'))
+    print(received_json)
     received_payload = received_json['data']
     re = struct.unpack('IIdd', base64.b64decode(received_payload))
     # print(re)
@@ -25,12 +26,14 @@ def uplink(request):
 
 def livemap(request):
   if request.method == 'GET':
+    # get the latest bike location
     location = Location.objects.order_by('-id')[0]
     context = {'latitude': location.latitude, 'longitude': location.longitude}
     return render(request, 'livemap.html', context)
 
 def livemap_ajax(request):
   if request.method == 'GET':
+    # get the latest bike location
     location = Location.objects.order_by('-id')[0]
     context = {'latitude': location.latitude, 'longitude': location.longitude}
     return JsonResponse(context)

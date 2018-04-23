@@ -1,7 +1,7 @@
 $(document).ready(function() {
   // create map instance
   let map = new BMap.Map("track-map");
-  // create a point
+  // create a central point
   const minDisplayLevel = 3;
   const maxDisplayLevel = 19;
   let $la_num = $('#la-num');
@@ -31,6 +31,7 @@ $(document).ready(function() {
     }
     const temp = data.slice(len - 2, len);
     const polyline = new BMap.Polyline(temp, {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});
+    polyline.disableMassClear();
     map.addOverlay(polyline);
     console.log("expandRoute");
   }
@@ -38,6 +39,7 @@ $(document).ready(function() {
   // start ajax querying
   let translateCallback = function(data) {
     if(data.status === 0) {
+      map.clearOverlays()
       const marker = new BMap.Marker(data.points[0]);
       map.addOverlay(marker);
       // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
@@ -58,6 +60,6 @@ $(document).ready(function() {
     });
   };
 
-  window.setInterval(updateLocation, 3000);
+  window.setInterval(updateLocation, 5000);
 
 });
