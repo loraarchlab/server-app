@@ -71,12 +71,12 @@ def livemap_ajax(request):
       context = get_dict_from_record(None)
     return JsonResponse(context)
 
-def data_record(request, record_num):
+def datarecord(request, record_num):
   if request.method == 'GET':
     locations = Location.objects.order_by('-id')[:record_num]
     record_list = []
     for location in locations:
-      context = get_str_from_record(location)
-      record_list.append(str(context))
-    return HttpResponse('<hr/>'.join(record_list))
+      record = get_dict_from_record(location)
+      record_list.append(record)
+    return render(request, 'datarecord.html', {'record_list': record_list})
     
