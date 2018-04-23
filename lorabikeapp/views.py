@@ -21,30 +21,44 @@ def uplink(request):
     received_rssi = received_json['rxInfo'][0]['rssi']
     received_fnt = received_json['fCnt']
     # if not re[2] and not re[3]:
+    print(re)
     Location.objects.create(track_time = datetime.datetime.now(), frame_count = received_fnt,
                               latitude = re[2], longitude = re[3], snr = received_snr, 
                               rssi = received_rssi)
     return HttpResponse("Get the post data.")
     
+def get_dict_from_record(location):    
+  if location:
+    context = {'latitude': location.latitude,
+               'longitude': location.longitude,
+               'track_time': location.track_time.strftime("%Y-%m-%d %H:%I:%S"),
+               'frame_count': location.frame_count,
+               'snr': location.snr,
+               'rssi': location.rssi}
+  else:
+    context = {'latitude': 0,
+               'longitude': 0,
+               'track_time': "0",
+               'frame_count': 0,
+               'snr': 0,
+               'rssi': 0}
+  return context
 
+def get_str_from_record(location):
+  pattern = 'id: %u, track_time: %s, frame_count: %u, latitude: %f, longitude: %f, snr: %f, rssi: %d'
+  context = (location.id, location.track_time.strftime("%Y-%m-%d %H:%I:%S"), location.frame_count,
+             location.latitude, location.longitude, location.snr, location.rssi)
+  return pattern % context
+ 
+  
 def livemap(request):
   if request.method == 'GET':
     # get the latest bike location
     locations = Location.objects.order_by('-id')
     if locations:
-      context = {'latitude': locations[0].latitude, 
-                 'longitude': locations[0].longitude,
-                 'track_time': locations[0].track_time.strftime("%Y-%m-%d %H:%I:%S"),
-                 'frame_count': locations[0].frame_count,
-                 'snr': locations[0].snr,
-                 'rssi': locations[0].rssi}
+      context = get_dict_from_record(locations[0])
     else:
-      context = {'latitude': 0,
-                 'longitude': 0,
-                 'track_time': "0",
-                 'frame_count': 0,
-                 'snr': 0,
-                 'rssi': 0}
+      context = get_dict_from_record(None)
     return render(request, 'livemap.html', context)
 
 def livemap_ajax(request):
@@ -52,17 +66,17 @@ def livemap_ajax(request):
     # get the latest bike location
     locations = Location.objects.order_by('-id')
     if locations:
-      context = {'latitude': locations[0].latitude,
-                 'longitude': locations[0].longitude,
-                 'track_time': locations[0].track_time.strftime("%Y-%m-%d %H:%I:%S"),
-                 'frame_count': locations[0].frame_count,
-                 'snr': locations[0].snr,
-                 'rssi': locations[0].rssi}
+      context = get_dict_from_record(locations[0])
     else:
-      context = {'latitude': 0,
-                 'longitude': 0,
-                 'track_time': "0",
-                 'frame_count': 0,
-                 'snr': 0,
-                 'rssi': 0}
+      context = get_dict_from_record(None)
     return JsonResponse(context)
+
+def data_record(request):
+  if request.method == 'GET':
+    locations = Location.objects.order_by('-id')[:300]
+    record_list = []
+    for location in locations:
+      context = get_str_from_record(location)
+      record_list.append(str(context))
+    return HttpResponse('<hr/>'.join(record_list))
+    

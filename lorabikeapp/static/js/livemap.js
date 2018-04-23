@@ -42,7 +42,7 @@ $(document).ready(function() {
 
   // start ajax querying
   let translateCallback = function(data) {
-    if(data.status === 0) {
+    if (data.status === 0) {
       map.clearOverlays()
       const marker = new BMap.Marker(data.points[0]);
       map.addOverlay(marker);
@@ -63,9 +63,10 @@ $(document).ready(function() {
       $tr_num.text(data.track_time);
       $fr_num.text(data.frame_count);
       $rs_num.text(data.rssi);
-      $sn_num.text(data.snr); 
-      convertor.translate([new BMap.Point(data.longitude, data.latitude)],
-                          1, 5, translateCallback);
+      $sn_num.text(data.snr);
+      if (data.latitude != 0 && data.longitude != 0) {
+        convertor.translate([new BMap.Point(data.longitude, data.latitude)], 1, 5, translateCallback);
+      }
     });
   };
 
