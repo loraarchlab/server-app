@@ -71,9 +71,9 @@ def livemap_ajax(request):
       context = get_dict_from_record(None)
     return JsonResponse(context)
 
-def data_record(request):
+def data_record(request, record_num):
   if request.method == 'GET':
-    locations = Location.objects.order_by('-id')[:300]
+    locations = Location.objects.order_by('-id')[:record_num]
     record_list = []
     for location in locations:
       context = get_str_from_record(location)
