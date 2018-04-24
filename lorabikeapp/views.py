@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.utils import timezone
 
 from lorabikeapp.models import Location
+from lorabikeapp.utils import wgs84_to_bd09
 
 import json
 import base64
@@ -14,30 +16,34 @@ import datetime
 def uplink(request):
   if request.method == 'POST':
     received_json = json.loads(request.body.decode('utf-8'))
-    print(received_json)
+    # print(received_json)
     received_payload = received_json['data']
     re = struct.unpack('IIdd', base64.b64decode(received_payload))
     received_snr = received_json['rxInfo'][0]['loRaSNR']
     received_rssi = received_json['rxInfo'][0]['rssi']
     received_fnt = received_json['fCnt']
-    # if not re[2] and not re[3]:
-    print(re)
-    Location.objects.create(track_time = datetime.datetime.now(), frame_count = received_fnt,
-                              latitude = re[2], longitude = re[3], snr = received_snr, 
-                              rssi = received_rssi)
+    received_co_y, received_co_x = wgs84_to_bd09(re[3], re[2])
+    # print(re)
+    Location.objects.create(frame_count = received_fnt,
+                            latitude = re[2], longitude = re[3], co_x = received_co_x,
+                            co_y = received_co_y, snr = received_snr, rssi = received_rssi)
     return HttpResponse("Get the post data.")
     
 def get_dict_from_record(location):    
   if location:
     context = {'latitude': location.latitude,
                'longitude': location.longitude,
-               'track_time': location.track_time.strftime("%Y-%m-%d %H:%I:%S"),
+               'co_x': location.co_x,
+               'co_y': location.co_y,
+               'track_time': timezone.localtime(location.track_time).strftime("%Y-%m-%d %H:%M:%S"),
                'frame_count': location.frame_count,
                'snr': location.snr,
                'rssi': location.rssi}
   else:
     context = {'latitude': 0,
                'longitude': 0,
+               'co_x': 0,
+               'co_y': 0,
                'track_time': "0",
                'frame_count': 0,
                'snr': 0,
