@@ -10,6 +10,8 @@ $(document).ready(function() {
   let $fr_num = $('#fr-num');
   let $rs_num = $('#rs-num');
   let $sn_num = $('#sn-num');
+  let $y_num = $('#y-num');
+  let $x_num = $('#x-num');
   const centralX = parseFloat($la_num.text());
   const centralY = parseFloat($lo_num.text());
   const centralPoint = new BMap.Point(centralY, centralX);
@@ -41,9 +43,9 @@ $(document).ready(function() {
   }
 
   // start ajax querying
-  let translateCallback = function(data) {
+  let updateRoute = function(data) {
     if (data.status === 0) {
-      map.clearOverlays()
+      map.clearOverlays();
       const marker = new BMap.Marker(data.points[0]);
       map.addOverlay(marker);
       // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
@@ -63,9 +65,11 @@ $(document).ready(function() {
       $tr_num.text(data.track_time);
       $fr_num.text(data.frame_count);
       $rs_num.text(data.rssi);
-      $sn_num.text(data.snr);
+      $sn_num.text(data.snri);
+      $x_num.text(data.co_x);
+      $y_num.text(data.co_y);
       if (data.latitude != 0 && data.longitude != 0) {
-        convertor.translate([new BMap.Point(data.longitude, data.latitude)], 1, 5, translateCallback);
+        updateRoute(new BMap.Point(data.co_y, data.co_x));
       }
     });
   };
