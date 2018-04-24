@@ -26,7 +26,27 @@ $(document).ready(function() {
     map.centerAndZoom(points[0], maxDisplayLevel);
     map.enableScrollWheelZoom(true);
     map.addControl(new BMap.NavigationControl());
-  }
+  };
+
+  let showPath = function(startPoint, EndPoint) {
+    let walking = new BMap.WalkingRoute(map, { 
+      renderOptions: {map: map, autoViewport: true},
+      onPolylinesSet: function(routes) {
+        map.addOverlay(routes[0].getPolyline());
+      },
+      onMarkersSet: function(routes) {
+        map.removeOverlay(routes[0].marker);
+        map.removeOverlay(routes[1].marker);
+      },
+    });
+    walking.search(startPoint, EndPoint);
+    /*
+    walking.setSearchCompleteCallback(function (rs) {
+      const pts = walking.getResults().getPlan(0).getRoute(0).getPath();
+      map.addOverlay(new BMap.Polyline(pts, { strokeColor: "green", strokeWeight: 2, strokeOpacity: 1 }));
+    });
+    */
+  };
 
   let infos = [];
   let points = [];
@@ -39,8 +59,11 @@ $(document).ready(function() {
       }
     }
     setZoom(points);
-    const polyline = new BMap.Polyline(points, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
-    map.addOverlay(polyline);
+    // const polyline = new BMap.Polyline(points, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
+    // map.addOverlay(polyline);
+    for (let index = 0; index < points.length - 1; index++) {
+      showPath(points[index], points[index + 1]);
+    }
     points.forEach(function(value, index) {
       let marker = new BMap.Marker(value);
       const infoWin = new BMap.InfoWindow('time: ' + infos[index].tr + '\ncount: ' + infos[index].fr,
@@ -49,7 +72,7 @@ $(document).ready(function() {
         this.openInfoWindow(infoWin);
       });
       map.addOverlay(marker);
-      console.log(index);
+      // console.log(index);
     });
   };
 

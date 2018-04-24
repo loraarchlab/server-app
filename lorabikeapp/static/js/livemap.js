@@ -12,8 +12,8 @@ $(document).ready(function() {
   let $sn_num = $('#sn-num');
   let $y_num = $('#y-num');
   let $x_num = $('#x-num');
-  const centralX = parseFloat($la_num.text());
-  const centralY = parseFloat($lo_num.text());
+  const centralX = parseFloat($x_num.text());
+  const centralY = parseFloat($y_num.text());
   const centralPoint = new BMap.Point(centralY, centralX);
   let convertor = new BMap.Convertor();
   // initialize map with central point
@@ -30,31 +30,49 @@ $(document).ready(function() {
     map.centerAndZoom(view.centor, view.zoom);
   }
   */
+
+  let showPath = function(startPoint, EndPoint) {
+    let walking = new BMap.WalkingRoute(map, {
+      renderOptions: {map: map, autoViewport: true},
+      onPolylinesSet: function(routes) {
+        let polyline = routes[0].getPolyline();
+        polyline.disableMassClear();
+        map.addOverlay(polyline);
+      },
+      onMarkersSet: function(routes) {
+        map.removeOverlay(routes[0].marker);
+        map.removeOverlay(routes[1].marker);
+      },
+    });
+    walking.search(startPoint, EndPoint);
+  };
+
   let expandRoute = function(data) {
     const len = data.length;
     if (len < 2) {
       return;
     }
     const temp = data.slice(len - 2, len);
-    const polyline = new BMap.Polyline(temp, {strokeColor:"red", strokeWeight:2, strokeOpacity:0.5});
+    /*
+    const polyline = new BMap.Polyline(temp, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
     polyline.disableMassClear();
     map.addOverlay(polyline);
+    */
+    showPath(temp[0], temp[1]);
     console.log("expandRoute");
-  }
+  };
 
   // start ajax querying
   let updateRoute = function(data) {
-    if (data.status === 0) {
-      map.clearOverlays();
-      const marker = new BMap.Marker(data.points[0]);
-      map.addOverlay(marker);
-      // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
-      // marker.setLabel(label);
-      map.setCenter(data.points[0]);
-      points.push(data.points[0]);
-      expandRoute(points);
-      // setZoom(points);
-    }
+    map.clearOverlays();
+    const marker = new BMap.Marker(data);
+    map.addOverlay(marker);
+    // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
+    // marker.setLabel(label);
+    map.setCenter(data);
+    points.push(data);
+    expandRoute(points);
+    // setZoom(points);
   };
 
   let updateLocation = function() {
@@ -69,6 +87,7 @@ $(document).ready(function() {
       $x_num.text(data.co_x);
       $y_num.text(data.co_y);
       if (data.latitude != 0 && data.longitude != 0) {
+        console.log("updaeRoute")
         updateRoute(new BMap.Point(data.co_y, data.co_x));
       }
     });
