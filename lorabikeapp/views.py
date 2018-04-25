@@ -80,31 +80,35 @@ def get_str_from_record(location):
   return pattern % context
  
   
-def livemap(request):
+def livemap(request, begin_id, end_id):
   if request.method == 'GET':
     # get the latest bike location
-    locations = Location.objects.order_by('-id')
-    if locations:
-      context = get_dict_from_record(locations[0])
-    else:
-      context = get_dict_from_record(None)
-    return render(request, 'livemap.html', context)
+    context = []
+    for dev_id in range(begin_id, end_id + 1):
+      locations = Location.objects.filter(device_id=dev_id).order_by('-id')
+      if locations:
+        context.append(get_dict_from_record(locations[0]))
+      else:
+        context.append(get_dict_from_record(None))
+    return render(request, 'livemap.html', {'record_list': context})
 
-def livemap_ajax(request):
+def livemap_ajax(request, begin_id, end_id):
   if request.method == 'GET':
     # get the latest bike location
-    locations = Location.objects.order_by('-id')
-    if locations:
-      context = get_dict_from_record(locations[0])
-    else:
-      context = get_dict_from_record(None)
-    return JsonResponse(context)
+    context = []
+    for dev_id in range(begin_id, end_id + 1):
+      locations = Location.objects.filter(device_id=dev_id).order_by('-id')
+      if locations:
+        context.append(get_dict_from_record(locations[0]))
+      else:
+        context.append(get_dict_from_record(None)) 
+    return JsonResponse({'record_list': context})
 
 def datarecord(request, begin_time, end_time, begin_id, end_id):
   if request.method == 'GET':
     begin_datetime = datetime.strptime(begin_time, '%Y-%m-%d-%H-%M-%S')
     end_datetime = datetime.strptime(end_time, '%Y-%m-%d-%H-%M-%S')
-    locations = Location.objects.filter(track_time__range=(begin_datetime, end_datetime)).filter(device_id__range = (begin_id, end_id))
+    locations = Location.objects.filter(track_time__range=(begin_datetime, end_datetime)).filter(device_id__range=(begin_id, end_id))
     record_list = []
     for location in locations:
       record = get_dict_from_record(location)

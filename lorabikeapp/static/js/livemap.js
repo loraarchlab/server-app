@@ -4,34 +4,68 @@ $(document).ready(function() {
   // create a central point
   const minDisplayLevel = 3;
   const maxDisplayLevel = 19;
-  let $la_num = $('#la-num');
-  let $lo_num = $('#lo-num');
-  let $tr_num = $('#tr-num');
-  let $fr_num = $('#fr-num');
-  let $rs_num = $('#rs-num');
-  let $sn_num = $('#sn-num');
-  let $y_num = $('#y-num');
-  let $x_num = $('#x-num');
-  let $id_num = $('#id-num');
-  const centralX = parseFloat($x_num.text());
-  const centralY = parseFloat($y_num.text());
-  const centralPoint = new BMap.Point(centralY, centralX);
-  let convertor = new BMap.Convertor();
-  // initialize map with central point
-  map.centerAndZoom(centralPoint, maxDisplayLevel);
+
+  let $la_num = $('.la-num');
+  let $lo_num = $('.lo-num');
+  let $tr_num = $('.tr-num');
+  let $fr_num = $('.fr-num');
+  let $rs_num = $('.rs-num');
+  let $sn_num = $('.sn-num');
+  let $y_num = $('.y-num');
+  let $x_num = $('.x-num');
+  let $id_num = $('.id-num');
+  let begin_num = parseInt($('#begin-num').text());
+  let end_num = parseInt($('#end-num').text());
+
+  let la_nums = $('.la-num').map(function() {
+    return parseFloat($(this).text());
+  });
+  let x_nums = $('.x-num').map(function() {
+    return parseFloat($(this).text());
+  });
+  let y_nums = $('.y-num').map(function() {
+    return parseFloat($(this).text());
+  });
+  let id_nums = $('.id-num').map(function() {
+    return parseInt($(this).text());
+  });
+  let tr_nums = $('.tr-num').map(function() {
+    return $(this).text();
+  });
+  let fr_nums = $('.fr-num').map(function() {
+    return parseInt($(this).text());
+  });
+
+  let infos = [];
+  let points = [];
+  let marker = [];
+
+  for (let index = 0; index < la_nums.length; index++) {
+    if (la_nums[index] != 0) {
+      infos.push({tr: tr_nums[index], fr: fr_nums[index], id: id_nums[index]});
+      points.push(new BMap.Point(y_nums[index], x_nums[index]));
+    }
+  }
+ 
+  let setZoom = function(points) {
+    const view = map.getViewport(points)
+    map.centerAndZoom(view.center, view.zoom);
+  }
+  setZoom(points); 
   map.enableScrollWheelZoom(true);
   map.addControl(new BMap.NavigationControl());
-  
-  let points = [];
+
+  points.forEach(function(value, index) {
+    marker[index] = new BMap.Marker(value);
+    const infoWin = new BMap.InfoWindow('time: ' + infos[index].tr + '\ndevice id: '+ infos[index].id + ' count: ' + infos[index].fr,
+                                        {enableMessage: false, width: 30, height: 20});
+    marker[index].addEventListener("click", function() {
+       this.openInfoWindow(infoWin);
+    });
+    map.addOverlay(marker[index]);
+  });
   
   /*
-  let setZoom = function(points) {
-    console.log('setZoom');
-    const view = map.getViewport(eval(points));
-    map.centerAndZoom(view.centor, view.zoom);
-  }
-  */
-
   let showPath = function(startPoint, EndPoint) {
     let walking = new BMap.WalkingRoute(map, {
       renderOptions: {map: map, autoViewport: true},
@@ -47,6 +81,7 @@ $(document).ready(function() {
     });
     walking.search(startPoint, EndPoint);
   };
+  */
 
   let expandRoute = function(data) {
     const len = data.length;
@@ -54,48 +89,57 @@ $(document).ready(function() {
       return;
     }
     const temp = data.slice(len - 2, len);
-    /*
+   
     const polyline = new BMap.Polyline(temp, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
     polyline.disableMassClear();
     map.addOverlay(polyline);
-    */
-    showPath(temp[0], temp[1]);
+   
+    // showPath(temp[0], temp[1]);
     console.log("expandRoute");
   };
 
   // start ajax querying
-  let updateRoute = function(data) {
-    map.clearOverlays();
-    const marker = new BMap.Marker(data);
-    map.addOverlay(marker);
-    // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
-    // marker.setLabel(label);
-    // map.setCenter(data);
-    points.push(data);
-    setZoom(points);
-    expandRoute(points);
-    // setZoom(points);
+  let updateRoute = function(data, index) {
+    map.removeOverlay(marker[index]);
+    marker[index] = new BMap.Marker(data);
+    const infoWin = new BMap.InfoWindow('time: ' + infos[index].tr + '\ndevice id: '+ infos[index].id + ' count: ' + infos[index].fr,
+                                        {enableMessage: false, width: 30, height: 20});
+    marker[index].addEventListener("click", function() {
+       this.openInfoWindow(infoWin);
+    });
+
+    map.addOverlay(marker[index]);
+    
+    const polyline = new BMap.Polyline([points[index], data], {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
+    map.addOverlay(polyline);
+
+    points[index] = data;
+    
+    // expandRoute(point[device);
   };
 
   let updateLocation = function() {
     $.get("ajax/", function(data){
-      console.log(data);
-      $la_num.text(data.latitude);
-      $lo_num.text(data.longitude);
-      $tr_num.text(data.track_time);
-      $fr_num.text(data.frame_count);
-      $rs_num.text(data.rssi);
-      $sn_num.text(data.snri);
-      $x_num.text(data.co_x);
-      $y_num.text(data.co_y);
-      $id_num.text(data.device_id);
-      if (data.latitude != 0 && data.longitude != 0) {
-        console.log("updaeRoute")
-        updateRoute(new BMap.Point(data.co_y, data.co_x));
-      }
+      data.record_list.forEach(function (value, index) {
+        $la_num.eq(index).text(value.latitude);
+        $lo_num.eq(index).text(value.longitude);
+        $tr_num.eq(index).text(value.track_time);
+        $fr_num.eq(index).text(value.frame_count);
+        $rs_num.eq(index).text(value.rssi);
+        $sn_num.eq(index).text(value.snri);
+        $x_num.eq(index).text(value.co_x);
+        $y_num.eq(index).text(value.co_y);
+        $id_num.eq(index).text(value.device_id); 
+        if (value.latitude != 0 && value.longitude != 0) {
+          console.log("updaeRoute");
+          infos[index] = {tr: value.track_time, fr: value.grame_count, id: value.device_id};
+          updateRoute(new BMap.Point(value.co_y, value.co_x), index);
+        }
+      }); 
+      setZoom(points);
     });
   };
 
-  window.setInterval(updateLocation, 500);
+  window.setInterval(updateLocation, 3000);
 
 });
