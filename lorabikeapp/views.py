@@ -9,7 +9,7 @@ from lorabikeapp.utils import wgs84_to_bd09
 import json
 import base64
 import struct
-import datetime
+from datetime import datetime
 
 # Create your views here.
 
@@ -22,16 +22,38 @@ def uplink(request):
     received_snr = received_json['rxInfo'][0]['loRaSNR']
     received_rssi = received_json['rxInfo'][0]['rssi']
     received_fnt = received_json['fCnt']
+    # received_id = re[0]
     received_co_y, received_co_x = wgs84_to_bd09(re[3], re[2])
     # print(re)
-    Location.objects.create(frame_count = received_fnt,
+    Location.objects.create(device_id = re[0], frame_count = received_fnt,
                             latitude = re[2], longitude = re[3], co_x = received_co_x,
                             co_y = received_co_y, snr = received_snr, rssi = received_rssi)
     return HttpResponse("Get the post data.")
+
     
+def uplink_mock(request):
+  if request.method == 'POST':
+    received_json = json.loads(request.body.decode('utf-8'))
+    # print(received_json)
+    received_id = received_json['id']
+    received_snr = received_json['snr']
+    received_rssi = received_json['rssi']
+    received_fnt = received_json['fnt']
+    received_la = received_json['la']
+    received_lo = received_json['lo']
+    received_coy, received_cox = wgs84_to_bd09(received_lo, received_la)
+    # received_id = re[0]
+    # received_co_y, received_co_x = wgs84_to_bd09(re[3], re[2])
+    # print(re)
+    Location.objects.create(device_id = received_id, frame_count = received_fnt,
+                            latitude = received_la, longitude = received_lo, co_x = received_cox,
+                            co_y = received_coy, snr = received_snr, rssi = received_rssi)
+    return HttpResponse("Get the post data.")
+
 def get_dict_from_record(location):    
   if location:
-    context = {'latitude': location.latitude,
+    context = {'device_id': location.device_id,
+               'latitude': location.latitude,
                'longitude': location.longitude,
                'co_x': location.co_x,
                'co_y': location.co_y,
@@ -40,7 +62,8 @@ def get_dict_from_record(location):
                'snr': location.snr,
                'rssi': location.rssi}
   else:
-    context = {'latitude': 0,
+    context = {'device_id': 0,
+               'latitude': 0,
                'longitude': 0,
                'co_x': 0,
                'co_y': 0,
@@ -52,7 +75,7 @@ def get_dict_from_record(location):
 
 def get_str_from_record(location):
   pattern = 'id: %u, track_time: %s, frame_count: %u, latitude: %f, longitude: %f, snr: %f, rssi: %d'
-  context = (location.id, location.track_time.strftime("%Y-%m-%d %H:%I:%S"), location.frame_count,
+  context = (location.id, location.track_time.strftime("%Y-%m-%d %H:%M:%S"), location.frame_count,
              location.latitude, location.longitude, location.snr, location.rssi)
   return pattern % context
  
@@ -77,9 +100,11 @@ def livemap_ajax(request):
       context = get_dict_from_record(None)
     return JsonResponse(context)
 
-def datarecord(request, record_num):
+def datarecord(request, begin_time, end_time, device_id):
   if request.method == 'GET':
-    locations = Location.objects.order_by('-id')[:record_num]
+    begin_datetime = datetime.strptime(begin_time, '%Y-%m-%d-%H-%M-%S')
+    end_datetime = datetime.strptime(end_time, '%Y-%m-%d-%H-%M-%S')
+    locations = Location.objects.filter(track_time__range=(begin_datetime, end_datetime)).filter(device_id = device_id)
     record_list = []
     for location in locations:
       record = get_dict_from_record(location)

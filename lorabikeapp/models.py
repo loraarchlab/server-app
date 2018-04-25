@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Location(models.Model):
+  device_id = models.PositiveIntegerField(default = 0)
   frame_count = models.PositiveIntegerField(default = 0)
   track_time = models.DateTimeField(auto_now_add = True)
   latitude = models.FloatField(default = 0)

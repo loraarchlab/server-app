@@ -12,6 +12,7 @@ $(document).ready(function() {
   let $sn_num = $('#sn-num');
   let $y_num = $('#y-num');
   let $x_num = $('#x-num');
+  let $id_num = $('#id-num');
   const centralX = parseFloat($x_num.text());
   const centralY = parseFloat($y_num.text());
   const centralPoint = new BMap.Point(centralY, centralX);
@@ -86,6 +87,7 @@ $(document).ready(function() {
       $sn_num.text(data.snri);
       $x_num.text(data.co_x);
       $y_num.text(data.co_y);
+      $id_num.text(data.device_id);
       if (data.latitude != 0 && data.longitude != 0) {
         console.log("updaeRoute")
         updateRoute(new BMap.Point(data.co_y, data.co_x));

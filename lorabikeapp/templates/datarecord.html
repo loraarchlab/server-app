@@ -20,6 +20,7 @@
     {% for record in record_list %}  
       <li>    
         <p class="location">Time:&nbsp;<span class='tr-num'>{{ record.track_time }}</span></p>
+        <p class="location">Device Id:&nbsp;<span class='id-num'>{{ record.device_id }}</span></p> 
         <p class="location">Frame Count:&nbsp;<span class='fr-num'>{{ record.frame_count }}</span></p>
         <p class="location">Latitude:&nbsp;<span class='la-num'>{{ record.latitude }}</span></p>
         <p class="location">Longitude:&nbsp;<span class='lo-num'>{{ record.longitude }}</span></p>

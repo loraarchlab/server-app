@@ -23,7 +23,8 @@ $(document).ready(function() {
   
   let setZoom = function(points) {
     console.log('setZoom');
-    map.centerAndZoom(points[0], maxDisplayLevel);
+    const view = map.getViewport(points)
+    map.centerAndZoom(view.center, view.zoom);
     map.enableScrollWheelZoom(true);
     map.addControl(new BMap.NavigationControl());
   };
@@ -40,12 +41,11 @@ $(document).ready(function() {
       },
     });
     walking.search(startPoint, EndPoint);
-    /*
+    
     walking.setSearchCompleteCallback(function (rs) {
       const pts = walking.getResults().getPlan(0).getRoute(0).getPath();
       map.addOverlay(new BMap.Polyline(pts, { strokeColor: "green", strokeWeight: 2, strokeOpacity: 1 }));
     });
-    */
   };
 
   let infos = [];
@@ -59,11 +59,13 @@ $(document).ready(function() {
       }
     }
     setZoom(points);
-    // const polyline = new BMap.Polyline(points, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
-    // map.addOverlay(polyline);
+    const polyline = new BMap.Polyline(points, {strokeColor:"red", strokeWeight:6, strokeOpacity:0.5});
+    map.addOverlay(polyline);
+    /*
     for (let index = 0; index < points.length - 1; index++) {
       showPath(points[index], points[index + 1]);
     }
+    */
     points.forEach(function(value, index) {
       let marker = new BMap.Marker(value);
       const infoWin = new BMap.InfoWindow('time: ' + infos[index].tr + '\ncount: ' + infos[index].fr,
