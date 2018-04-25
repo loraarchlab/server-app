@@ -13,27 +13,40 @@
 </head>
 
 <body>
-  <h1>LoRa Bike Tracking</h1>
+  <h1>LoRa Bike Tracking History</h1>
   <div id="track-map"></div>
+  
   {% if record_list %}
-    <ul>
-    {% for record in record_list %}  
-      <li>    
-        <p class="location">Time:&nbsp;<span class='tr-num'>{{ record.track_time }}</span></p>
-        <p class="location">Device Id:&nbsp;<span class='id-num'>{{ record.device_id }}</span></p> 
-        <p class="location">Frame Count:&nbsp;<span class='fr-num'>{{ record.frame_count }}</span></p>
-        <p class="location">Latitude:&nbsp;<span class='la-num'>{{ record.latitude }}</span></p>
-        <p class="location">Longitude:&nbsp;<span class='lo-num'>{{ record.longitude }}</span></p>
-        <p class="location">RSSI:&nbsp;<span class='rs-num'>{{ record.rssi }}</span></p>
-        <p class="location">SNR:&nbsp;<span class='sn-num'>{{ record.snr }}</span></p>
-        <p class="location">Co_x:&nbsp;<span class='x-num'>{{ record.co_x }}</span></p>
-        <p class="location">Co_y:&nbsp;<span class='y-num'>{{ record.co_y }}</span></p>
+    <table class='table table-hover table-striped'>
+      <tr>
+        <th>Time</th>
+        <th>Device Id</th>
+        <th>Frame Count</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>RSSI</th>
+        <th>SNR</th>
+        <th>Co_x</th>
+        <th>Co_y</th>
+      </tr>
+    {% for record in record_list %}
+      <tr>
+        <td class='tr-num'>{{ record.track_time }}</td>
+        <td class='id-num'>{{ record.device_id }}</td>
+        <td class='fr-num'>{{ record.frame_count }}</td>
+        <td class='la-num'>{{ record.latitude }}</td>
+        <td class='lo-num'>{{ record.longitude }}</td>
+        <td class='rs-num'>{{ record.rssi }}</td>
+        <td class='sn-num'>{{ record.snr }}</td>
+        <td class='x-num'>{{ record.co_x }}</td>
+        <td class='y-num'>{{ record.co_y }}</td>
       </li>
     {% endfor %}
     </ul>
   {% else %}
     <p>No data records are available.</p>
   {% endif %}
+
   <!-- include the javascript api file -->
   <script src="http://api.map.baidu.com/api?v=3.0&ak=PsXGGKusCXo2tR27G3esOysXcMs0OG6b"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
