@@ -132,7 +132,7 @@ $(document).ready(function() {
         $id_num.eq(index).text(value.device_id); 
         if (value.latitude != 0 && value.longitude != 0) {
           console.log("updaeRoute");
-          infos[index] = {tr: value.track_time, fr: value.grame_count, id: value.device_id};
+          infos[index] = {tr: value.track_time, fr: value.frame_count, id: value.device_id};
           updateRoute(new BMap.Point(value.co_y, value.co_x), index);
         }
       }); 
