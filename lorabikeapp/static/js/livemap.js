@@ -70,8 +70,9 @@ $(document).ready(function() {
     map.addOverlay(marker);
     // const label = new BMap.Label("LoRaBike",{offset:new BMap.Size(20,-10)});
     // marker.setLabel(label);
-    map.setCenter(data);
+    // map.setCenter(data);
     points.push(data);
+    setZoom(points);
     expandRoute(points);
     // setZoom(points);
   };
@@ -95,6 +96,6 @@ $(document).ready(function() {
     });
   };
 
-  window.setInterval(updateLocation, 5000);
+  window.setInterval(updateLocation, 500);
 
 });
