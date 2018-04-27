@@ -23,6 +23,12 @@ $(document).ready(function() {
   let id_nums = $('.id-num').map(function() {
     return parseInt($(this).text());
   });
+  let rs_nums = $('.rs-num').map(function() {
+    return parseInt($(this).text());
+  });
+  let sn_nums = $('.sn-num').map(function() {
+    return parseFloat($(this).text());
+  });
 
   let setZoom = function(points) {
     console.log('setZoom');
@@ -68,7 +74,8 @@ $(document).ready(function() {
           point[cat] = [];
           cat++;
         }
-        info[exist[dev_id]].push({tr: tr_nums[index], fr: fr_nums[index], id: dev_id});
+        info[exist[dev_id]].push({tr: tr_nums[index], fr: fr_nums[index], 
+                                  id: dev_id, rs: rs_nums[index], sn: sn_nums[index]});
         point[exist[dev_id]].push(new BMap.Point(y_nums[index], x_nums[index]));
         points.push(new BMap.Point(y_nums[index], x_nums[index]));
       }
@@ -79,8 +86,8 @@ $(document).ready(function() {
       map.addOverlay(polyline);
       value.forEach(function(value1, index1) { 
         let marker = new BMap.Marker(value1);
-        const infoWin = new BMap.InfoWindow('time: ' + info[index][index1].tr + '\ndevice id: '+ info[index][index1].id + ' count: ' + info[index][index1].fr,
-                                          {enableMessage: false, width: 30, height: 20});
+        const infoWin = new BMap.InfoWindow('time: ' + info[index][index1].tr + '<br/>device id: '+ info[index][index1].id + ' count: ' + info[index][index1].fr + 
+                                            '<br/>rssi: ' + info[index][index1].rs + ' snr: ' + info[index][index1].sn, {enableMessage: false, width: 30, height: 70});
         marker.addEventListener("click", function() {
           this.openInfoWindow(infoWin);
         });
