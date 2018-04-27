@@ -53,10 +53,10 @@ def uplink_mock(request):
 def get_dict_from_record(location):    
   if location:
     context = {'device_id': location.device_id,
-               'latitude': location.latitude,
-               'longitude': location.longitude,
-               'co_x': location.co_x,
-               'co_y': location.co_y,
+               'latitude': round(location.latitude, 6),
+               'longitude': round(location.longitude, 6),
+               'co_x': round(location.co_x, 6),
+               'co_y': round(location.co_y, 6),
                'track_time': timezone.localtime(location.track_time).strftime("%Y-%m-%d %H:%M:%S"),
                'frame_count': location.frame_count,
                'snr': location.snr,

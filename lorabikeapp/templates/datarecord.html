@@ -28,6 +28,7 @@
         <th>SNR</th>
         <th>Co_x</th>
         <th>Co_y</th>
+        <th>Distance(m)</th>
       </tr>
     {% for record in record_list %}
       <tr>
@@ -40,6 +41,7 @@
         <td class='sn-num'>{{ record.snr }}</td>
         <td class='x-num'>{{ record.co_x }}</td>
         <td class='y-num'>{{ record.co_y }}</td>
+        <td class='di-num'>0.00</td>
       </li>
     {% endfor %}
     </ul>
